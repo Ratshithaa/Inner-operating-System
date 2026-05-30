@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inner Operating System — Assessment</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --surface: #1a1a1a;
+    --surface2: #222;
+    --border: #2e2e2e;
+    --text: #f0ede8;
+    --muted: #888;
+    --accent: #e8c547;
+    --accent2: #4fc4a0;
+    --danger: #e87c6b;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding-bottom: 80px; }
+
+  .top-bar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 16px 20px; position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; }
+  .top-bar h1 { font-family: 'DM Serif Display', serif; font-size: 18px; font-weight: 400; color: var(--accent); }
+  .progress-pill { font-size: 12px; color: var(--muted); background: var(--surface2); padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border); }
+
+  .hero { padding: 32px 20px 24px; background: linear-gradient(160deg, #1a1a1a 0%, #0f0f0f 100%); border-bottom: 1px solid var(--border); }
+  .hero-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+  .hero h2 { font-family: 'DM Serif Display', serif; font-size: 26px; font-weight: 400; line-height: 1.3; margin-bottom: 8px; }
+  .hero p { font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+  .name-section { padding: 24px 20px; border-bottom: 1px solid var(--border); }
+  .name-section label { display: block; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .name-section input { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px; outline: none; transition: border-color 0.2s; }
+  .name-section input:focus { border-color: var(--accent); }
+  .phase-toggle { display: flex; gap: 8px; margin-top: 16px; }
+  .phase-btn { flex: 1; padding: 10px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+  .phase-btn.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 600; }
+
+  .scale-legend { display: flex; gap: 0; padding: 12px 20px; background: var(--surface2); border-bottom: 1px solid var(--border); overflow-x: auto; }
+  .legend-item { flex: 1; text-align: center; min-width: 54px; }
+  .legend-num { font-size: 16px; font-weight: 600; color: var(--accent); }
+  .legend-txt { font-size: 10px; color: var(--muted); margin-top: 2px; line-height: 1.3; }
+
+  .module-block { margin: 0; border-bottom: 1px solid var(--border); }
+  .module-head { padding: 16px 20px 12px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+  .module-num { width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: #000; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .module-title { font-size: 13px; font-weight: 600; color: var(--text); }
+  .module-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .question-card { padding: 18px 20px; border-bottom: 1px solid var(--border); }
+  .q-num { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+  .q-text { font-size: 14px; color: var(--text); line-height: 1.6; margin-bottom: 14px; }
+  .rating-btns { display: flex; gap: 6px; }
+  .r-btn { flex: 1; height: 44px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+  .r-btn:active { transform: scale(0.95); }
+  .r-btn.sel-pre { background: #e8c54722; border-color: var(--accent); color: var(--accent); }
+  .r-btn.sel-post { background: #4fc4a022; border-color: var(--accent2); color: var(--accent2); }
+
+  .submit-area { padding: 24px 20px; position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg); border-top: 1px solid var(--border); }
+  .submit-btn { width: 100%; padding: 16px; background: var(--accent); color: #000; border: none; border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
+  .submit-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .submit-btn:not(:disabled):active { opacity: 0.85; }
+
+  .toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); background: var(--accent2); color: #000; padding: 12px 24px; border-radius: 100px; font-size: 13px; font-weight: 600; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
+  .toast.show { opacity: 1; }
+
+  .success-screen { display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; padding: 40px 20px; text-align: center; }
+  .success-icon { font-size: 64px; margin-bottom: 24px; }
+  .success-screen h2 { font-family: 'DM Serif Display', serif; font-size: 28px; font-weight: 400; color: var(--accent2); margin-bottom: 12px; }
+  .success-screen p { font-size: 14px; color: var(--muted); line-height: 1.7; max-width: 280px; }
+
+  .answered-bar { height: 3px; background: var(--border); position: sticky; top: 57px; z-index: 99; }
+  .answered-fill { height: 100%; background: var(--accent); transition: width 0.3s; width: 0%; }
+</style>
+</head>
+<body>
+
+<div id="main-form">
+  <div class="top-bar">
+    <h1>Inner Operating System</h1>
+    <div class="progress-pill" id="prog-pill">0 / 18</div>
+  </div>
+  <div class="answered-bar"><div class="answered-fill" id="prog-fill"></div></div>
+
+  <div class="hero">
+    <div class="hero-label">Engineering Excellence Workshop</div>
+    <h2>How well do you know yourself right now?</h2>
+    <p>Rate yourself honestly from 1 to 5. There are no right or wrong answers — this is for your own growth.</p>
+  </div>
+
+  <div class="name-section">
+    <label>Your full name</label>
+    <input type="text" id="student-name" placeholder="Enter your name..." autocomplete="name" />
+    <div class="phase-toggle">
+      <button class="phase-btn active" id="btn-pre" onclick="setPhase('pre')">📋 Pre-workshop</button>
+      <button class="phase-btn" id="btn-post" onclick="setPhase('post')">✅ Post-workshop</button>
+    </div>
+  </div>
+
+  <div class="scale-legend">
+    <div class="legend-item"><div class="legend-num">1</div><div class="legend-txt">Not at all</div></div>
+    <div class="legend-item"><div class="legend-num">2</div><div class="legend-txt">Slightly</div></div>
+    <div class="legend-item"><div class="legend-num">3</div><div class="legend-txt">Somewhat</div></div>
+    <div class="legend-item"><div class="legend-num">4</div><div class="legend-txt">Mostly</div></div>
+    <div class="legend-item"><div class="legend-num">5</div><div class="legend-txt">Completely</div></div>
+  </div>
+
+  <div id="questions-container"></div>
+
+  <div class="submit-area">
+    <button class="submit-btn" id="submit-btn" onclick="submitForm()" disabled>Complete all 18 questions to submit</button>
+  </div>
+</div>
+
+<div class="success-screen" id="success-screen">
+  <div class="success-icon">🎯</div>
+  <h2>Assessment submitted!</h2>
+  <p>Your responses have been recorded. See you on the other side of this workshop.</p>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxlvjVNPZTw24EOpoKgiFJdTQ8iQ72XDBz5ecDS6uxQUSpneOCEAxUzeneMEnKnTiQ/exec";
+
+const modules = [
+  { title: "Self-doubt & avoidance", sub: "Confidence · Fear of judgment · Comparison", questions: [
+    "I avoid certain opportunities because I feel I may not perform well enough.",
+    "I wait for the 'right mood' before starting important work.",
+    "I feel uncomfortable when I have to speak in front of unfamiliar people."
+  ]},
+  { title: "Inner blocks", sub: "Comparison · Persistence · Procrastination", questions: [
+    "I compare my progress with others more than I should.",
+    "When something becomes difficult, I sometimes lose interest quickly.",
+    "I know what I should do, but I delay taking action."
+  ]},
+  { title: "Focus & self-awareness", sub: "Distraction · Self-perception · Curiosity", questions: [
+    "I get distracted easily even when I know something is important.",
+    "I often think about what others may think about me.",
+    "I hesitate to ask questions because I fear sounding wrong."
+  ]},
+  { title: "Resilience & growth", sub: "Potential · Composure · Adaptability", questions: [
+    "I sometimes feel I am capable of more than what I currently show.",
+    "I stay calm and continue working even when pressure increases.",
+    "I can adapt when situations change unexpectedly."
+  ]},
+  { title: "Mindset & ownership", sub: "Accountability · Curiosity · Future readiness", questions: [
+    "I try to improve myself instead of blaming situations constantly.",
+    "I usually explore new ideas, technologies, or trends even when it is not compulsory.",
+    "I sometimes think about whether my current skills will match future industry expectations."
+  ]},
+  { title: "Learning & communication", sub: "Beyond academics · Clarity · Adaptability", questions: [
+    "I enjoy learning things that may help me grow beyond academics alone.",
+    "I communicate differently depending on the person and situation.",
+    "People usually understand what I am trying to explain clearly."
+  ]}
+];
+
+const TOTAL_Q = 18;
+let phase = 'pre';
+let ratings = {};
+
+function setPhase(p) {
+  phase = p;
+  document.getElementById('btn-pre').classList.toggle('active', p === 'pre');
+  document.getElementById('btn-post').classList.toggle('active', p === 'post');
+  renderAll();
+}
+
+function renderAll() {
+  const container = document.getElementById('questions-container');
+  let html = '';
+  let qNum = 0;
+  modules.forEach((mod, mi) => {
+    html += `<div class="module-block">
+      <div class="module-head">
+        <div class="module-num">${mi+1}</div>
+        <div><div class="module-title">${mod.title}</div><div class="module-sub">${mod.sub}</div></div>
+      </div>`;
+    mod.questions.forEach((q, qi) => {
+      qNum++;
+      const key = `${mi}_${qi}`;
+      html += `<div class="question-card">
+        <div class="q-num">Question ${qNum}</div>
+        <div class="q-text">${q}</div>
+        <div class="rating-btns">`;
+      for (let i = 1; i <= 5; i++) {
+        const sel = ratings[`${phase}_${key}`] === i ? `sel-${phase}` : '';
+        html += `<button class="r-btn ${sel}" onclick="rate('${key}', ${i})">${i}</button>`;
+      }
+      html += `</div></div>`;
+    });
+    html += `</div>`;
+  });
+  container.innerHTML = html;
+  updateProgress();
+}
+
+function rate(key, val) {
+  ratings[`${phase}_${key}`] = val;
+  renderAll();
+  showToast(`Rated ${val}`);
+}
+
+function updateProgress() {
+  let answered = 0;
+  modules.forEach((mod, mi) => {
+    mod.questions.forEach((_, qi) => {
+      if (ratings[`${phase}_${mi}_${qi}`]) answered++;
+    });
+  });
+  const pct = Math.round((answered / TOTAL_Q) * 100);
+  document.getElementById('prog-pill').textContent = `${answered} / ${TOTAL_Q}`;
+  document.getElementById('prog-fill').style.width = pct + '%';
+  const btn = document.getElementById('submit-btn');
+  if (answered === TOTAL_Q) {
+    btn.disabled = false;
+    btn.textContent = `Submit ${phase === 'pre' ? 'Pre' : 'Post'}-Workshop Assessment →`;
+  } else {
+    btn.disabled = true;
+    btn.textContent = `${TOTAL_Q - answered} question${(TOTAL_Q - answered) !== 1 ? 's' : ''} remaining`;
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1000);
+}
+
+async function submitForm() {
+  const name = document.getElementById('student-name').value.trim();
+  if (!name) { showToast('Please enter your name first'); return; }
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+
+  const scores = [];
+  modules.forEach((mod, mi) => {
+    mod.questions.forEach((_, qi) => {
+      scores.push(ratings[`${phase}_${mi}_${qi}`] || 0);
+    });
+  });
+
+  const payload = { name, phase, timestamp: new Date().toISOString(), scores };
+
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    document.getElementById('main-form').style.display = 'none';
+    document.getElementById('success-screen').style.display = 'flex';
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = 'Submit Assessment →';
+    showToast('Network error — try again');
+  }
+}
+
+renderAll();
+</script>
+</body>
+</html>
