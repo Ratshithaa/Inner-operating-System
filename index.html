@@ -7,25 +7,27 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0f0f0f;
-    --surface: #1a1a1a;
-    --surface2: #222;
-    --border: #2e2e2e;
-    --text: #f0ede8;
-    --muted: #888;
-    --accent: #e8c547;
-    --accent2: #4fc4a0;
+    --bg: #f5f8fc;
+    --surface: #ffffff;
+    --surface2: #eef2f7;
+    --border: #d4dde8;
+    --text: #1a2535;
+    --muted: #6b8099;
+    --accent: #3DAEE9;
+    --accent2: #7AC143;
     --danger: #e87c6b;
     --radius: 12px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding-bottom: 80px; }
 
-  .top-bar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 16px 20px; position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; }
+  .top-bar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 20px; position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; }
+  .top-bar-left { display: flex; align-items: center; gap: 12px; }
+  .top-bar-logo { height: 40px; width: auto; object-fit: contain; }
   .top-bar h1 { font-family: 'DM Serif Display', serif; font-size: 18px; font-weight: 400; color: var(--accent); }
   .progress-pill { font-size: 12px; color: var(--muted); background: var(--surface2); padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border); }
 
-  .hero { padding: 32px 20px 24px; background: linear-gradient(160deg, #1a1a1a 0%, #0f0f0f 100%); border-bottom: 1px solid var(--border); }
+  .hero { padding: 32px 20px 24px; background: linear-gradient(160deg, #e8f4fd 0%, #f5f8fc 100%); border-bottom: 1px solid var(--border); }
   .hero-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
   .hero h2 { font-family: 'DM Serif Display', serif; font-size: 26px; font-weight: 400; line-height: 1.3; margin-bottom: 8px; }
   .hero p { font-size: 13px; color: var(--muted); line-height: 1.7; }
@@ -36,7 +38,7 @@
   .name-section input:focus { border-color: var(--accent); }
   .phase-toggle { display: flex; gap: 8px; margin-top: 16px; }
   .phase-btn { flex: 1; padding: 10px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; transition: all 0.2s; }
-  .phase-btn.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 600; }
+  .phase-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
 
   .scale-legend { display: flex; gap: 0; padding: 12px 20px; background: var(--surface2); border-bottom: 1px solid var(--border); overflow-x: auto; }
   .legend-item { flex: 1; text-align: center; min-width: 54px; }
@@ -45,7 +47,7 @@
 
   .module-block { margin: 0; border-bottom: 1px solid var(--border); }
   .module-head { padding: 16px 20px 12px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
-  .module-num { width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: #000; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .module-num { width: 28px; height: 28px; border-radius: 50%; background: var(--accent2); color: #fff; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .module-title { font-size: 13px; font-weight: 600; color: var(--text); }
   .module-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
 
@@ -55,11 +57,11 @@
   .rating-btns { display: flex; gap: 6px; }
   .r-btn { flex: 1; height: 44px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
   .r-btn:active { transform: scale(0.95); }
-  .r-btn.sel-pre { background: #e8c54722; border-color: var(--accent); color: var(--accent); }
-  .r-btn.sel-post { background: #4fc4a022; border-color: var(--accent2); color: var(--accent2); }
+  .r-btn.sel-pre { background: #3DAEE922; border-color: var(--accent); color: var(--accent); }
+  .r-btn.sel-post { background: #7AC14322; border-color: var(--accent2); color: var(--accent2); }
 
   .submit-area { padding: 24px 20px; position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg); border-top: 1px solid var(--border); }
-  .submit-btn { width: 100%; padding: 16px; background: var(--accent); color: #000; border: none; border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
+  .submit-btn { width: 100%; padding: 16px; background: var(--accent2); color: #fff; border: none; border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
   .submit-btn:disabled { opacity: 0.3; cursor: not-allowed; }
   .submit-btn:not(:disabled):active { opacity: 0.85; }
 
@@ -79,7 +81,10 @@
 
 <div id="main-form">
   <div class="top-bar">
-    <h1>Inner Operating System</h1>
+    <div class="top-bar-left">
+      <img src="rumination-logo.png" alt="Rumination" class="top-bar-logo" />
+      <h1>Inner Operating System</h1>
+    </div>
     <div class="progress-pill" id="prog-pill">0 / 18</div>
   </div>
   <div class="answered-bar"><div class="answered-fill" id="prog-fill"></div></div>
